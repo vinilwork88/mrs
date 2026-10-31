@@ -28,12 +28,12 @@ const services = [
 
 type Service = (typeof services)[number];
 
-const trust: { icon: IconName; label: string }[] = [
-  { icon: "award", label: "Experienced artists & stylists" },
-  { icon: "shield", label: "Hygienic & safe environment" },
-  { icon: "gem", label: "Premium products & equipment" },
-  { icon: "users", label: "Personalized care & attention" },
-];
+// const trust: { icon: IconName; label: string }[] = [
+//   { icon: "award", label: "Experienced artists & stylists" },
+//   { icon: "shield", label: "Hygienic & safe environment" },
+//   { icon: "gem", label: "Premium products & equipment" },
+//   { icon: "users", label: "Personalized care & attention" },
+// ];
 
 function Thumbs({ slug, className }: { slug: string; className: string }) {
   return (
@@ -123,7 +123,7 @@ export default function Services() {
       </div>
 
       {/* Trust strip */}
-      <div className="border-y border-border bg-surface">
+      {/* <div className="border-y border-border bg-surface">
         <ul className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 py-8 sm:px-6 lg:grid-cols-4 lg:gap-0 lg:divide-x lg:divide-border">
           {trust.map(({ icon, label }) => (
             <li
@@ -135,10 +135,10 @@ export default function Services() {
             </li>
           ))}
         </ul>
-      </div>
+      </div> */}
 
       {/* Call to action */}
-      <div className="px-4 py-16 text-center sm:px-6">
+      {/* <div className="px-4 py-16 text-center sm:px-6">
         <h3 className="text-sm font-bold uppercase tracking-[0.4em]">Ready for a fresh look?</h3>
         <p className="mt-2 text-sm text-muted">Book your appointment now on WhatsApp</p>
         <a
@@ -158,7 +158,7 @@ export default function Services() {
           </span>
           <span className="h-px flex-1 bg-gold/50" />
         </div>
-      </div>
+      </div> */}
     </section>
   );
 }

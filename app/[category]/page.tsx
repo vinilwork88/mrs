@@ -1,28 +1,61 @@
-import fs from "node:fs";
-import path from "node:path";
-import Image from "next/image";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { cacheLife } from "next/cache";
 import { categories } from "@/lib/categories";
+import MediaGrid, { type Item } from "@/components/MediaGrid";
 
-function getMedia(slug: string) {
-    const dir = path.join(process.cwd(), "public/gallery", slug);
-    if (!fs.existsSync(dir)) return [];
-    return fs
-        .readdirSync(dir)
-        .filter((file) => /\.(jpe?g|png|webp|mp4)$/i.test(file))
-        .sort();
+type Resource = { public_id: string; version: number; format: string; created_at: string };
+type Entry = Item & { createdAt: string };
+
+const { CLOUDINARY_CLOUD_NAME: CLOUD, CLOUDINARY_API_KEY: KEY, CLOUDINARY_API_SECRET: SECRET } = process.env;
+const auth = Buffer.from(`${KEY}:${SECRET}`).toString("base64");
+
+async function list(slug: string, type: "image" | "video"): Promise<Entry[]> {
+    const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD}/resources/${type}/tags/${slug}?max_results=100`,
+        { headers: { Authorization: `Basic ${auth}` } },
+    );
+    if (!res.ok) {
+        console.log("Cloudinary list failed:", type, slug, res.status);
+        return [];
+    }
+
+    const { resources } = (await res.json()) as { resources: Resource[] };
+    const base = `https://res.cloudinary.com/${CLOUD}/${type}/upload/q_auto`;
+
+    return resources.map((r) => {
+        const path = `v${r.version}/${r.public_id}`;
+        if (type === "video") {
+            const src = `${base}/${path}.mp4`;
+            return { src, full: src, isVideo: true, createdAt: r.created_at };
+        }
+        return {
+            src: `${base},c_limit,w_1200/${path}.${r.format}`,
+            full: `${base},c_limit,w_2000/${path}.${r.format}`,
+            isVideo: false,
+            createdAt: r.created_at,
+        };
+    });
+}
+
+async function getMedia(slug: string): Promise<Entry[]> {
+    "use cache";
+    cacheLife("minutes");
+
+    const [images, videos] = await Promise.all([list(slug, "image"), list(slug, "video")]);
+    return [...images, ...videos].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 export function generateStaticParams() {
     return categories.map(({ slug }) => ({ category: slug }));
 }
 
-export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+async function Category({ params }: { params: Promise<{ category: string }> }) {
     const { category } = await params;
     const item = categories.find((c) => c.slug === category);
     if (!item) notFound();
 
-    const media = getMedia(item.slug);
+    const media = await getMedia(item.slug);
 
     return (
         <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
@@ -31,27 +64,16 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
             {media.length === 0 ? (
                 <p className="mt-4 text-muted">Photos and videos coming soon.</p>
             ) : (
-                <ul className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-                    {media.map((file) => {
-                        const src = `/gallery/${item.slug}/${file}`;
-                        return (
-                            <li key={file} className="relative aspect-square overflow-hidden rounded-lg border border-border">
-                                {file.toLowerCase().endsWith(".mp4") ? (
-                                    <video src={src} controls preload="metadata" className="size-full object-cover" />
-                                ) : (
-                                    <Image
-                                        src={src}
-                                        alt={`${item.title} work`}
-                                        fill
-                                        sizes="(min-width: 1024px) 25vw, 50vw"
-                                        className="object-cover"
-                                    />
-                                )}
-                            </li>
-                        );
-                    })}
-                </ul>
+                <MediaGrid items={media} title={item.title} />
             )}
         </main>
+    );
+}
+
+export default function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
+    return (
+        <Suspense fallback={<main className="mx-auto max-w-7xl px-4 py-16 sm:px-6" />}>
+            <Category params={params} />
+        </Suspense>
     );
 }

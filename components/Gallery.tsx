@@ -1,8 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { categories } from "@/lib/categories";
 
 export default function Gallery() {
+
+    const categories = [
+        { slug: "tattoos", title: "Tattoos", image: "/gallery/tattoos/cover.png" },
+        { slug: "hairstyles", title: "Hairstyles", image: "/gallery/hairstyles/cover.png" },
+        { slug: "beauty", title: "Men's Beauty Parlour", image: "/gallery/beauty/cover.png" },
+    ];
+
     return (
         <section id="gallery" className="border-t border-border">
             <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
@@ -14,7 +20,7 @@ export default function Gallery() {
                         <Link
                             key={slug}
                             href={`/${slug}`}
-                            className="group relative isolate flex aspect-4/5 flex-col justify-end overflow-hidden rounded-lg border border-border p-6 text-white"
+                            className="group relative isolate flex aspect-4/3 flex-col justify-end overflow-hidden rounded-lg border border-border p-6 text-white"
                         >
                             <Image
                                 src={image}

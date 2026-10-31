@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import ContactForm from "./ContactForm";
 import Icon, { type IconName } from "./Icon";
 
-const MAP_QUERY = "MRS tattoos & hair"; // better: "17.3850, 78.4867" or the full address
+const MAP_URL = "https://www.google.com/maps?q=19.54776382446289,79.63754272460938&z=17&hl=en"; // better: "17.3850, 78.4867" or the full address
 
 const hours = [
   ["Monday – Saturday", "10:00 AM – 10:00 PM"],
@@ -11,9 +11,9 @@ const hours = [
 ];
 
 const socials: { icon: IconName; label: string; href: string }[] = [
-  { icon: "instagram", label: "Instagram", href: "https://instagram.com/YOUR_HANDLE" },
-  { icon: "facebook", label: "Facebook", href: "https://facebook.com/YOUR_PAGE" },
-  { icon: "youtube", label: "YouTube", href: "https://youtube.com/@YOUR_CHANNEL" },
+  { icon: "instagram", label: "Instagram", href: "https://www.instagram.com/mrs_tatoos/" },
+  { icon: "facebook", label: "Facebook", href: "https://www.instagram.com/mrs_tatoos/" },
+  { icon: "youtube", label: "YouTube", href: "https://www.instagram.com/mrs_tatoos/" },
 ];
 
 function Info({ icon, title, children }: { icon: IconName; title: string; children: ReactNode }) {
@@ -58,12 +58,14 @@ export default function Contact() {
             <a href="https://wa.me/919493015544" className="hover:text-accent">+91 94930 15544</a>
           </Info>
           <Info icon="pin" title="Location">
-            MRS Tattoos &amp; Hair Styles
-            <br />
-            [Your address here]
+            <a href={MAP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-accent">
+              MRS Tattoos &amp; Hair Styles
+              <br />
+              Lonavelly, Telangana 504299
+            </a>
           </Info>
           <Info icon="mail" title="Email">
-            <a href="mailto:mrstattoos@gmail.com" className="hover:text-accent">mrstattoos@gmail.com</a>
+            <a href="mailto:Saipolaji@gmail.com" className="hover:text-accent">Saipolaji@gmail.com</a>
           </Info>
           <Info icon="users" title="Follow us">
             <div className="flex gap-3">
@@ -85,24 +87,26 @@ export default function Contact() {
 
         <ContactForm />
 
-        <div>
-          <div className="relative h-64 overflow-hidden rounded-lg border border-border lg:h-72">
-            <iframe
-              src={`https://maps.google.com/maps?q=${encodeURIComponent(MAP_QUERY)}&z=16&output=embed`}
-              title="MRS Tattoos & Hair Styles location"
-              loading="lazy"
-              className="absolute inset-0 size-full border-0 dark:invert dark:hue-rotate-180"
+        <a
+          href={MAP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group block overflow-hidden rounded-lg border border-border"
+        >
+          <div className="relative h-64 bg-black lg:h-72">
+            <Image
+              src="/google-map.png"
+              alt="MRS Tattoos & Hair Styles logo"
+              fill
+              sizes="(min-width: 1024px) 40vw, 100vw"
+              className="object-contain p-6 transition-transform duration-500 group-hover:scale-105"
             />
           </div>
-          <a
-            href="https://maps.app.goo.gl/3MhURY8thUZri1XE6"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline"
-          >
+          <span className="flex min-h-12 items-center justify-center gap-2 border-t border-border bg-surface text-sm font-medium text-accent group-hover:underline">
+            <Icon name="pin" className="size-4" />
             Open in Google Maps →
-          </a>
-        </div>
+          </span>
+        </a>
 
         <div>
           <div className="flex gap-4">
